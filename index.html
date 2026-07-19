@@ -289,6 +289,34 @@
       font-size: 14px;
     }
 
+    .prep-note {
+      margin: 0 0 20px;
+      padding: 14px 16px 14px 18px;
+      border-left: 4px solid var(--accent);
+      background: #f3eee5;
+      border-radius: 10px;
+    }
+    .prep-title {
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-size: 12px;
+      font-weight: 850;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .prep-note ul {
+      margin: 0;
+      padding-left: 1.2em;
+      line-height: 1.55;
+      text-align: left;
+    }
+    .prep-note li + li { margin-top: 6px; }
+    .prep-next {
+      margin: 22px auto 4px;
+      max-width: 520px;
+      text-align: left;
+    }
+
     @media (max-width: 820px) {
       header { align-items: stretch; flex-direction: column; }
       .picker { min-width: 0; width: 100%; }
@@ -335,6 +363,7 @@
           <div class="eyebrow">Session complete</div>
           <h2>Nice work.</h2>
           <p>You got the guitar into your hands for 30 focused minutes. That is the habit.</p>
+          <div id="nextPrep"></div>
           <button class="primary" id="restartBtn">Restart this session</button>
         </div>
       </section>
@@ -366,6 +395,10 @@ const lessons = [
   {
     week: 1, session: 1,
     summary: "Reconnect with familiar lead vocabulary, attack the unfinished section first, then wake up an old song.",
+    decideBefore: [
+      "Your <strong>current song</strong> — the one you're finishing — and specifically the <strong>unfinished section</strong> you'll attack first.",
+      "<strong>Old song #1</strong>: one acoustic/chord-based song you used to know and want to recover."
+    ],
     sections: [
       {
         minutes: 5,
@@ -454,6 +487,10 @@ const lessons = [
   {
     week: 2, session: 3,
     summary: "Make the warmup serve a real song, isolate the biggest weakness, then begin building a small repertoire.",
+    decideBefore: [
+      "<strong>Three open chords</strong> drawn from old song #1, to drill in the warmup.",
+      "<strong>Old song #2</strong>: a second song to start recovering."
+    ],
     sections: [
       {
         minutes: 5,
@@ -553,6 +590,9 @@ const lessons = [
   {
     week: 3, session: 5,
     summary: "Connect scale degrees to chord construction, move the first song into maintenance, and begin a new song.",
+    decideBefore: [
+      "Your <strong>new song</strong> to put into the learning pipeline — and its <strong>first meaningful section</strong> (intro, verse, or main riff) to start on."
+    ],
     sections: [
       {
         minutes: 5,
@@ -602,6 +642,9 @@ const lessons = [
   {
     week: 3, session: 6,
     summary: "Refresh movable chord shapes, keep the old project alive with one run, and add another chunk to the new song.",
+    decideBefore: [
+      "One familiar <strong>major barre-chord shape</strong> and one <strong>minor barre-chord shape</strong> to move around the neck."
+    ],
     sections: [
       {
         minutes: 5,
@@ -636,7 +679,7 @@ const lessons = [
         </ol>`
       },
       {
-        minus: 10,
+        minutes: 10,
         title: "Repertoire + play",
         purpose: "End by making music rather than doing drills.",
         html: `<ul>
@@ -649,6 +692,9 @@ const lessons = [
   {
     week: 4, session: 7,
     summary: "Explore roots inside your pentatonic shape, keep song #1 in maintenance, continue the new song, then test memory.",
+    decideBefore: [
+      "Which recovered song you'll try to play <strong>cold</strong> (no looking anything up) — make sure at least one is solid enough by now."
+    ],
     sections: [
       {
         minutes: 5,
@@ -695,6 +741,9 @@ const lessons = [
   {
     week: 4, session: 8,
     summary: "Use the A-string major scale, give the new song the main work block, then close with a small repertoire set.",
+    decideBefore: [
+      "The <strong>2–3 songs</strong> you'll play in the closing free repertoire set (any you know or are recovering)."
+    ],
     sections: [
       {
         minutes: 5,
@@ -758,6 +807,7 @@ const sessionTitle = document.getElementById("sessionTitle");
 const sessionSummary = document.getElementById("sessionSummary");
 const timeline = document.getElementById("timeline");
 const completeBanner = document.getElementById("completeBanner");
+const nextPrep = document.getElementById("nextPrep");
 const restartBtn = document.getElementById("restartBtn");
 const prevSessionBtn = document.getElementById("prevSessionBtn");
 const nextSessionBtn = document.getElementById("nextSessionBtn");
@@ -828,10 +878,18 @@ function showOverview() {
 
   completeBanner.classList.remove("show");
   activeContent.style.display = "";
+  const decideBefore = lesson.decideBefore || [];
+  const decideBlock = decideBefore.length ? `
+    <div class="prep-note prep-before">
+      <div class="prep-title">Decide before this session</div>
+      <ul>${decideBefore.map(d => `<li>${d}</li>`).join("")}</ul>
+    </div>` : "";
+
   activeContent.innerHTML = `
     <div class="eyebrow">Week ${lesson.week} · Session ${lesson.session} · ${totalMinutes} minutes · ${lesson.sections.length} sections</div>
     <h2 class="section-title">Session overview</h2>
     <p class="overview-intro">${lesson.summary}</p>
+    ${decideBlock}
     <div class="overview-list">
       ${lesson.sections.map((s, i) => `
         <div class="overview-item">
@@ -1003,6 +1061,7 @@ function sectionFinished() {
 function completeSession() {
   stopTimer();
   activeContent.style.display = "none";
+  renderNextPrep();
   completeBanner.classList.add("show");
   timerLabel.textContent = "Session complete";
   timerEl.textContent = "30:00";
@@ -1021,6 +1080,22 @@ function restartSession() {
   nextSectionBtn.disabled = false;
   resetSectionBtn.disabled = false;
   showOverview();
+}
+// On the completion banner, show what to decide before the next session
+// (drawn from the next lesson's own "decide before" list) so the prep
+// reminder reaches you while you still have time to act on it.
+function renderNextPrep() {
+  const next = lessons[lessonIndex + 1];
+  const items = next && next.decideBefore ? next.decideBefore : [];
+  if (!next || !items.length) {
+    nextPrep.innerHTML = "";
+    return;
+  }
+  nextPrep.innerHTML = `
+    <div class="prep-note prep-next">
+      <div class="prep-title">For your next lesson — Week ${next.week} · Session ${next.session}</div>
+      <ul>${items.map(d => `<li>${d}</li>`).join("")}</ul>
+    </div>`;
 }
 function saveProgress() {
   localStorage.setItem("guitarPracticeProgress", JSON.stringify({lessonIndex, sectionIndex}));
