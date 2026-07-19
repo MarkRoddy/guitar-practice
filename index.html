@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Guitar Practice — 4 Week Restart Plan</title>
+  <style>
+    :root {
+      --bg: #f5f2ea;
+      --panel: #fffdf8;
+      --ink: #1f2328;
+      --muted: #6b6f76;
+      --line: #d9d3c7;
+      --accent: #7a4f2f;
+      --accent-soft: #eadbc8;
+      --done: #dfe9df;
+      --shadow: 0 10px 30px rgba(35, 28, 20, .09);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(122,79,47,.08), transparent 30rem),
+        var(--bg);
+      min-height: 100vh;
+    }
+    button, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 18px 48px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 48px);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 650px;
+    }
+    .picker {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+      background: rgba(255,255,255,.45);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      min-width: 360px;
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    select {
+      appearance: none;
+      background: var(--panel);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 34px 10px 11px;
+      min-width: 130px;
+    }
+    .primary, .secondary, .ghost {
+      border-radius: 11px;
+      padding: 10px 14px;
+      border: 1px solid transparent;
+      font-weight: 750;
+    }
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+    .secondary {
+      background: var(--accent-soft);
+      color: #422a19;
+      border-color: rgba(122,79,47,.16);
+    }
+    .ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+    button:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .lesson {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(270px, .8fr);
+      gap: 18px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+    .main-card { padding: 22px; }
+    .side-card { padding: 18px; align-self: start; position: sticky; top: 18px; }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 12px;
+      font-weight: 850;
+      color: var(--accent);
+      margin-bottom: 7px;
+    }
+    .section-title {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 40px);
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+    }
+    .section-purpose {
+      color: var(--muted);
+      margin: 10px 0 18px;
+      line-height: 1.55;
+    }
+    .instructions {
+      font-size: 17px;
+      line-height: 1.65;
+    }
+    .instructions ol, .instructions ul { padding-left: 1.3em; }
+    .instructions li + li { margin-top: 8px; }
+    .callout {
+      margin-top: 18px;
+      padding: 14px 16px;
+      background: #f3eee5;
+      border-left: 4px solid var(--accent);
+      border-radius: 10px;
+      line-height: 1.5;
+    }
+
+    .timer-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+      margin-bottom: 4px;
+    }
+    .timer {
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(58px, 10vw, 90px);
+      font-weight: 850;
+      letter-spacing: -0.06em;
+      line-height: .95;
+      margin: 5px 0 16px;
+    }
+    .progress-track {
+      height: 10px;
+      background: #e9e4da;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      transform-origin: left center;
+      background: var(--accent);
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .controls .wide { grid-column: 1 / -1; }
+
+    .session-meta {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+    .session-meta h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+    .session-meta p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .timeline {
+      margin-top: 18px;
+      display: grid;
+      gap: 8px;
+    }
+    .timeline-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px 12px;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 10px;
+      align-items: start;
+      background: rgba(255,255,255,.45);
+    }
+    .timeline-item.active {
+      border-color: var(--accent);
+      background: #f4eadf;
+    }
+    .timeline-item.done {
+      background: var(--done);
+      opacity: .78;
+    }
+    .mins {
+      font-weight: 850;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .timeline-item strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+    .timeline-item small { color: var(--muted); }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .complete-banner {
+      display: none;
+      text-align: center;
+      padding: 36px 20px;
+    }
+    .complete-banner.show { display: block; }
+    .complete-banner h2 {
+      font-size: 34px;
+      margin: 0 0 8px;
+    }
+
+    @media (max-width: 820px) {
+      header { align-items: stretch; flex-direction: column; }
+      .picker { min-width: 0; width: 100%; }
+      .lesson { grid-template-columns: 1fr; }
+      .side-card { position: static; order: -1; }
+      .timer { font-size: 68px; }
+    }
+    @media (max-width: 520px) {
+      .picker { grid-template-columns: 1fr 1fr; }
+      .picker .primary { grid-column: 1 / -1; }
+      .controls { grid-template-columns: 1fr; }
+      .controls .wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Guitar Practice</h1>
+        <p class="subtitle">A four-week restart plan: mechanics, focused song work, and actual playing. Pick the session, press start, and follow the screen.</p>
+      </div>
+      <div class="picker">
+        <label>Week
+          <select id="weekSelect"></select>
+        </label>
+        <label>Session
+          <select id="sessionSelect"></select>
+        </label>
+        <button class="primary" id="loadBtn">Load lesson</button>
+      </div>
+    </header>
+
+    <div class="top-actions">
+      <button class="ghost" id="prevSessionBtn">← Previous session</button>
+      <button class="ghost" id="nextSessionBtn">Next session →</button>
+      <button class="ghost" id="resetProgressBtn">Reset saved progress</button>
+    </div>
+
+    <main class="lesson" id="lessonView">
+      <section class="card main-card">
+        <div id="activeContent"></div>
+        <div class="complete-banner" id="completeBanner">
+          <div class="eyebrow">Session complete</div>
+          <h2>Nice work.</h2>
+          <p>You got the guitar into your hands for 30 focused minutes. That is the habit.</p>
+          <button class="primary" id="restartBtn">Restart this session</button>
+        </div>
+      </section>
+
+      <aside class="card side-card">
+        <div class="timer-label" id="timerLabel">Current section</div>
+        <div class="timer" id="timer">05:00</div>
+        <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+
+        <div class="controls">
+          <button class="primary wide" id="startPauseBtn">Start</button>
+          <button class="secondary" id="prevSectionBtn">← Back</button>
+          <button class="secondary" id="nextSectionBtn">Next →</button>
+          <button class="ghost wide" id="resetSectionBtn">Reset section timer</button>
+        </div>
+
+        <div class="session-meta">
+          <h3 id="sessionTitle">Week 1 · Session 1</h3>
+          <p id="sessionSummary"></p>
+        </div>
+
+        <div class="timeline" id="timeline"></div>
+      </aside>
+    </main>
+  </div>
+
+<script>
+const lessons = [
+  {
+    week: 1, session: 1,
+    summary: "Reconnect with familiar lead vocabulary, attack the unfinished section first, then wake up an old song.",
+    sections: [
+      {
+        minutes: 5,
+        title: "Pentatonic warmup",
+        purpose: "Reconnect your fingers with a familiar lead-guitar vocabulary.",
+        html: `<ol>
+          <li>Play the familiar pentatonic shape you use for soloing, ascending and descending slowly, twice.</li>
+          <li>Play it again, but pause briefly on the root note each time you encounter it.</li>
+          <li>Spend the remaining time freely improvising inside that shape.</li>
+        </ol>
+        <div class="callout">Don’t worry yet about whether you remember the theoretical name of the scale. Use the shape you already know.</div>`
+      },
+      {
+        minutes: 15,
+        title: "Current song — attack the missing section",
+        purpose: "Spend your best concentration on the part you still haven’t figured out.",
+        html: `<ul>
+          <li><strong>Do not play the whole song first.</strong></li>
+          <li>Work only on the unfinished section.</li>
+          <li>Break it into very small chunks—even 2–4 seconds of music at a time.</li>
+          <li>Loop each chunk until it starts to feel repeatable, then connect chunks.</li>
+          <li>Before moving on, write down or record what you figured out so you don’t have to rediscover it next time.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "Recover one old song",
+        purpose: "Wake up music that is already somewhere in your memory.",
+        html: `<ul>
+          <li>Pick one acoustic/chord-based song you used to know.</li>
+          <li>Spend a few minutes reconstructing the chords and structure.</li>
+          <li>Then play as much of it as you can.</li>
+          <li>Don’t stop every time you make a mistake. Keep the song moving.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    week: 1, session: 2,
+    summary: "Use your major scale, return immediately to the difficult section, then do a full-song run and continue recovering the old song.",
+    sections: [
+      {
+        minutes: 5,
+        title: "Major-scale warmup",
+        purpose: "Reconnect the scale shape to actual root notes on the neck.",
+        html: `<ol>
+          <li>Use the major-scale shape starting on the low E string that you already know.</li>
+          <li>Play it ascending and descending twice.</li>
+          <li>Pick a different root somewhere on the E string and play the same shape there.</li>
+          <li>Name the root aloud before you start: “This is G major,” “This is A major,” etc.</li>
+        </ol>
+        <div class="callout">No need to name every note yet.</div>`
+      },
+      {
+        minutes: 10,
+        title: "Current song — revisit the difficult section",
+        purpose: "Build directly on what you discovered last session.",
+        html: `<ul>
+          <li>Immediately return to the difficult section from Session 1.</li>
+          <li>Review your notes or recording before guessing from scratch.</li>
+          <li>Try to play the whole difficult section slowly and connect its pieces.</li>
+        </ul>`
+      },
+      {
+        minutes: 5,
+        title: "Current song — full-song run",
+        purpose: "Test the section in context without turning the run-through into another debugging session.",
+        html: `<ul>
+          <li>Play the entire song from beginning to end.</li>
+          <li><strong>Do not stop for mistakes.</strong></li>
+          <li>Notice where the song still feels shaky. You do not need to fix every issue right now.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "Same old song as Session 1",
+        purpose: "Move the recovered song closer to something you can simply pick up and play.",
+        html: `<ul>
+          <li>Return to the same old song from Session 1.</li>
+          <li>Recover any missing chords, lyrics, or transitions.</li>
+          <li>By the end, try one complete play-through—even if it is imperfect.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    week: 2, session: 3,
+    summary: "Make the warmup serve a real song, isolate the biggest weakness, then begin building a small repertoire.",
+    sections: [
+      {
+        minutes: 5,
+        title: "Chord-change warmup",
+        purpose: "Practice chord changes that immediately improve music you are actually playing.",
+        html: `<ol>
+          <li>Take <strong>three open chords from the old song you recovered last week.</strong></li>
+          <li>Cycle continuously: Chord 1 → Chord 2 → Chord 3 → Chord 1.</li>
+          <li>Start with four beats on each chord.</li>
+          <li>For the last minute or two, reduce it to two beats per chord.</li>
+        </ol>`
+      },
+      {
+        minutes: 7,
+        title: "Current song — hardest remaining spot",
+        purpose: "Fix one meaningful weakness instead of vaguely practicing the whole song.",
+        html: `<ul>
+          <li>Identify the single weakest remaining portion.</li>
+          <li>Work only on that spot.</li>
+          <li>Slow it down enough that you can repeat it correctly.</li>
+          <li>Gradually reconnect it to the measures immediately before and after it.</li>
+        </ul>`
+      },
+      {
+        minutes: 8,
+        title: "Current song — play-throughs",
+        purpose: "Practice performance and identify only one next improvement.",
+        html: `<ol>
+          <li>Play the whole song once without stopping.</li>
+          <li>After the run, identify <strong>one thing</strong> to improve.</li>
+          <li>Spend a moment on that one thing, then play the song again.</li>
+        </ol>
+        <div class="callout">Do not create a list of six problems.</div>`
+      },
+      {
+        minutes: 10,
+        title: "Old-song repertoire",
+        purpose: "Keep one recovered song alive while starting to wake up another.",
+        html: `<ul>
+          <li>Play old song #1 once.</li>
+          <li>Then start recovering <strong>old song #2</strong>.</li>
+          <li>Prioritize remembering the chord progression and song structure over perfection.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    week: 2, session: 4,
+    summary: "Turn the pentatonic shape into phrases, give the current song a focused check, then keep expanding repertoire.",
+    sections: [
+      {
+        minutes: 5,
+        title: "Pentatonic + phrasing",
+        purpose: "Shift from running a scale to making musical statements.",
+        html: `<ol>
+          <li>Use the same familiar pentatonic shape as Week 1.</li>
+          <li>Play a short 3–5 note phrase.</li>
+          <li>Pause.</li>
+          <li>Answer it with another phrase.</li>
+          <li>Use bends, slides, hammer-ons, or other techniques that feel natural.</li>
+        </ol>
+        <div class="callout">Think “make music with five notes,” not “practice a scale.”</div>`
+      },
+      {
+        minutes: 5,
+        title: "Current song — trouble spot",
+        purpose: "Give the weakest area one concentrated burst of attention.",
+        html: `<ul>
+          <li>Go directly to the current biggest trouble spot.</li>
+          <li>Loop it slowly.</li>
+          <li>Try to finish the block with 2–3 clean repetitions in a row.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "Current song — perform it",
+        purpose: "Let the song become a song instead of an endless project.",
+        html: `<ul>
+          <li>Play the song from beginning to end 2–3 times.</li>
+          <li>Keep going through small mistakes.</li>
+          <li>Notice whether the song now feels “good enough” to move out of active learning.</li>
+        </ul>
+        <div class="callout"><strong>80–90% may be good enough.</strong> You do not need to polish this song indefinitely before starting another one.</div>`
+      },
+      {
+        minutes: 10,
+        title: "Repertoire",
+        purpose: "Strengthen retrieval instead of relearning the same material each time.",
+        html: `<ul>
+          <li>Play old song #1 once.</li>
+          <li>Continue recovering old song #2.</li>
+          <li>Keep moving through mistakes where possible.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    week: 3, session: 5,
+    summary: "Connect scale degrees to chord construction, move the first song into maintenance, and begin a new song.",
+    sections: [
+      {
+        minutes: 5,
+        title: "Major scale + chord connection",
+        purpose: "Start connecting the scale shape you know to how chords are built.",
+        html: `<ol>
+          <li>Play your familiar major-scale shape from the E string.</li>
+          <li>Count the scale degrees: 1 – 2 – 3 – 4 – 5.</li>
+          <li>Find and play <strong>1, 3, and 5</strong> separately.</li>
+          <li>Then play the major chord whose root you started on.</li>
+        </ol>
+        <div class="callout">You do not need to instantly know the note names. The goal is: <strong>scale shape → 1/3/5 → chord.</strong></div>`
+      },
+      {
+        minutes: 5,
+        title: "Song #1 — maintenance",
+        purpose: "Keep the nearly learned song alive without letting it consume the whole practice plan.",
+        html: `<ul>
+          <li>Play the difficult section once or twice.</li>
+          <li>Then do one complete run-through.</li>
+          <li>Move on when the timer ends.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "New song",
+        purpose: "Create forward motion by putting a new piece of music into the pipeline.",
+        html: `<ul>
+          <li>Start learning your next song.</li>
+          <li>Focus only on the <strong>first meaningful section</strong>: intro, verse, main riff, or whatever makes sense.</li>
+          <li>Work in small chunks and make a note of what you discover.</li>
+          <li>Do not feel obligated to map the entire song today.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "Repertoire",
+        purpose: "Make old songs increasingly available without needing a relearning session.",
+        html: `<ul>
+          <li>Play old song #1.</li>
+          <li>Play as much of old song #2 as you currently remember.</li>
+          <li>Keep the emphasis on playing, not debugging.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    week: 3, session: 6,
+    summary: "Refresh movable chord shapes, keep the old project alive with one run, and add another chunk to the new song.",
+    sections: [
+      {
+        minutes: 5,
+        title: "Barre-chord movement",
+        purpose: "Refresh movable major/minor shapes and root-finding.",
+        html: `<ol>
+          <li>Pick one familiar major barre-chord shape and one familiar minor shape.</li>
+          <li>Move them around the neck: G major, A major, C major, G minor, A minor.</li>
+          <li>Use the E or A string to locate roots as needed.</li>
+          <li>Focus on getting a clean chord quickly—not squeezing harder.</li>
+        </ol>`
+      },
+      {
+        minutes: 5,
+        title: "Previous current song",
+        purpose: "Maintain it with minimal time.",
+        html: `<ul>
+          <li>Play one complete run-through.</li>
+          <li>Only stop afterward to fix something if there was an obvious train wreck.</li>
+          <li>Otherwise, move on.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "New song",
+        purpose: "Review first, then extend what you know.",
+        html: `<ol>
+          <li>Review the section you learned in Session 5.</li>
+          <li>Get it back under your fingers before adding more.</li>
+          <li>Then add the next logical chunk of the song.</li>
+          <li>Finish by connecting the old and new chunks if possible.</li>
+        </ol>`
+      },
+      {
+        minus: 10,
+        title: "Repertoire + play",
+        purpose: "End by making music rather than doing drills.",
+        html: `<ul>
+          <li>Play old songs #1 and #2.</li>
+          <li>Use any remaining time to noodle, improvise, or play anything you enjoy.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    week: 4, session: 7,
+    summary: "Explore roots inside your pentatonic shape, keep song #1 in maintenance, continue the new song, then test memory.",
+    sections: [
+      {
+        minutes: 5,
+        title: "Pentatonic exploration",
+        purpose: "Begin seeing the shape as notes and landmarks rather than only a fingering pattern.",
+        html: `<ol>
+          <li>Play your familiar pentatonic shape.</li>
+          <li>Deliberately find the <strong>same root note elsewhere inside the shape.</strong></li>
+          <li>Improvise, periodically landing on those roots.</li>
+        </ol>
+        <div class="callout">No diagram hunting during these five minutes. Explore with what you already know.</div>`
+      },
+      {
+        minutes: 5,
+        title: "Song #1 — maintenance",
+        purpose: "Keep it playable while resisting the urge to over-polish.",
+        html: `<ul>
+          <li>Do one full play-through.</li>
+          <li>Use only the remaining time to fix the biggest problem you noticed.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "New song",
+        purpose: "Keep building the active-learning song.",
+        html: `<ul>
+          <li>Review what you learned last time.</li>
+          <li>Continue with the next section or weakest connection.</li>
+          <li>Work slowly enough to repeat things correctly before speeding up.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "Repertoire",
+        purpose: "Practice recalling songs instead of immediately relying on references.",
+        html: `<ul>
+          <li>Play your recovered songs.</li>
+          <li>Try at least one <strong>without looking anything up first.</strong></li>
+          <li>Only check chords or lyrics afterward where your memory actually fails.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    week: 4, session: 8,
+    summary: "Use the A-string major scale, give the new song the main work block, then close with a small repertoire set.",
+    sections: [
+      {
+        minutes: 5,
+        title: "Major scale from the A string",
+        purpose: "Refresh the other major-scale position you already know.",
+        html: `<ol>
+          <li>Choose a root on the A string.</li>
+          <li>Name the root aloud.</li>
+          <li>Play your familiar major-scale shape ascending and descending.</li>
+          <li>Repeat from another root if time allows.</li>
+        </ol>
+        <div class="callout">For future sessions, rotate the warmup: major scale → pentatonic → chord changes → repeat.</div>`
+      },
+      {
+        minutes: 10,
+        title: "New song",
+        purpose: "Give the active-learning song the largest focused work block.",
+        html: `<ul>
+          <li>Review the material you already know.</li>
+          <li>Work on the next missing or weakest section.</li>
+          <li>Connect sections where possible.</li>
+          <li>Leave yourself a quick note or recording of anything that is easy to forget.</li>
+        </ul>`
+      },
+      {
+        minutes: 5,
+        title: "Song #1",
+        purpose: "Treat the old project as repertoire now, not as a permanent assignment.",
+        html: `<ul>
+          <li>Do one full play-through.</li>
+          <li>Keep moving through minor mistakes.</li>
+        </ul>`
+      },
+      {
+        minutes: 10,
+        title: "Free repertoire set",
+        purpose: "Finish the four-week block by simply playing guitar.",
+        html: `<ul>
+          <li>Play 2–3 songs you know or are recovering.</li>
+          <li>No drills.</li>
+          <li>No stopping to perfect every mistake.</li>
+          <li><strong>Just play guitar.</strong></li>
+        </ul>`
+      }
+    ]
+  }
+];
+
+const weekSelect = document.getElementById("weekSelect");
+const sessionSelect = document.getElementById("sessionSelect");
+const loadBtn = document.getElementById("loadBtn");
+const activeContent = document.getElementById("activeContent");
+const timerEl = document.getElementById("timer");
+const timerLabel = document.getElementById("timerLabel");
+const progressBar = document.getElementById("progressBar");
+const startPauseBtn = document.getElementById("startPauseBtn");
+const prevSectionBtn = document.getElementById("prevSectionBtn");
+const nextSectionBtn = document.getElementById("nextSectionBtn");
+const resetSectionBtn = document.getElementById("resetSectionBtn");
+const sessionTitle = document.getElementById("sessionTitle");
+const sessionSummary = document.getElementById("sessionSummary");
+const timeline = document.getElementById("timeline");
+const completeBanner = document.getElementById("completeBanner");
+const restartBtn = document.getElementById("restartBtn");
+const prevSessionBtn = document.getElementById("prevSessionBtn");
+const nextSessionBtn = document.getElementById("nextSessionBtn");
+const resetProgressBtn = document.getElementById("resetProgressBtn");
+
+let lessonIndex = 0;
+let sectionIndex = 0;
+let remainingSeconds = 0;
+let sectionTotalSeconds = 0;
+let running = false;
+let timerInterval = null;
+let lastTick = null;
+
+function populatePickers() {
+  [1,2,3,4].forEach(w => {
+    const o = document.createElement("option");
+    o.value = w; o.textContent = `Week ${w}`;
+    weekSelect.appendChild(o);
+  });
+  updateSessionPicker();
+  weekSelect.addEventListener("change", updateSessionPicker);
+}
+function updateSessionPicker() {
+  sessionSelect.innerHTML = "";
+  const w = Number(weekSelect.value || 1);
+  lessons.filter(l => l.week === w).forEach(l => {
+    const o = document.createElement("option");
+    o.value = l.session;
+    o.textContent = `Session ${l.session}`;
+    sessionSelect.appendChild(o);
+  });
+}
+function findLessonIndex(week, session) {
+  return lessons.findIndex(l => l.week === Number(week) && l.session === Number(session));
+}
+function syncPickerToLesson() {
+  const l = lessons[lessonIndex];
+  weekSelect.value = l.week;
+  updateSessionPicker();
+  sessionSelect.value = l.session;
+}
+function loadLesson(index, restoreSaved = true) {
+  stopTimer();
+  lessonIndex = Math.max(0, Math.min(index, lessons.length - 1));
+  sectionIndex = 0;
+  syncPickerToLesson();
+
+  const saved = restoreSaved ? JSON.parse(localStorage.getItem("guitarPracticeProgress") || "null") : null;
+  if (saved && saved.lessonIndex === lessonIndex && Number.isInteger(saved.sectionIndex)) {
+    sectionIndex = Math.min(saved.sectionIndex, lessons[lessonIndex].sections.length - 1);
+  }
+  loadSection(sectionIndex, false);
+  renderMeta();
+}
+function renderMeta() {
+  const lesson = lessons[lessonIndex];
+  sessionTitle.textContent = `Week ${lesson.week} · Session ${lesson.session}`;
+  sessionSummary.textContent = lesson.summary;
+  prevSessionBtn.disabled = lessonIndex === 0;
+  nextSessionBtn.disabled = lessonIndex === lessons.length - 1;
+}
+function loadSection(index, autoplay = false) {
+  stopTimer();
+  const lesson = lessons[lessonIndex];
+  sectionIndex = Math.max(0, Math.min(index, lesson.sections.length - 1));
+  const s = lesson.sections[sectionIndex];
+  sectionTotalSeconds = s.minutes * 60;
+  remainingSeconds = sectionTotalSeconds;
+  completeBanner.classList.remove("show");
+  activeContent.style.display = "";
+
+  activeContent.innerHTML = `
+    <div class="eyebrow">Week ${lesson.week} · Session ${lesson.session} · Section ${sectionIndex + 1} of ${lesson.sections.length}</div>
+    <h2 class="section-title">${s.title}</h2>
+    <p class="section-purpose">${s.purpose}</p>
+    <div class="instructions">${s.html}</div>
+  `;
+  timerLabel.textContent = `${s.minutes} minute section`;
+  prevSectionBtn.disabled = sectionIndex === 0;
+  nextSectionBtn.textContent = sectionIndex === lesson.sections.length - 1 ? "Finish →" : "Next →";
+  updateTimerDisplay();
+  renderTimeline();
+  saveProgress();
+  if (autoplay) startTimer();
+}
+function renderTimeline() {
+  const lesson = lessons[lessonIndex];
+  timeline.innerHTML = "";
+  lesson.sections.forEach((s, i) => {
+    const div = document.createElement("div");
+    div.className = "timeline-item" + (i === sectionIndex ? " active" : "") + (i < sectionIndex ? " done" : "");
+    div.innerHTML = `<div class="mins">${s.minutes} min</div><div><strong>${s.title}</strong><small>Section ${i+1}</small></div>`;
+    div.addEventListener("click", () => loadSection(i, false));
+    timeline.appendChild(div);
+  });
+}
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+function updateTimerDisplay() {
+  timerEl.textContent = formatTime(Math.max(0, Math.ceil(remainingSeconds)));
+  const ratio = sectionTotalSeconds ? Math.max(0, remainingSeconds / sectionTotalSeconds) : 0;
+  progressBar.style.transform = `scaleX(${ratio})`;
+  startPauseBtn.textContent = running ? "Pause" : (remainingSeconds < sectionTotalSeconds ? "Resume" : "Start");
+  document.title = `${formatTime(Math.max(0, Math.ceil(remainingSeconds)))} — Guitar Practice`;
+}
+function startTimer() {
+  if (running || remainingSeconds <= 0) return;
+  running = true;
+  lastTick = Date.now();
+  startPauseBtn.textContent = "Pause";
+  timerInterval = setInterval(() => {
+    const now = Date.now();
+    const elapsed = (now - lastTick) / 1000;
+    lastTick = now;
+    remainingSeconds -= elapsed;
+    if (remainingSeconds <= 0) {
+      remainingSeconds = 0;
+      updateTimerDisplay();
+      sectionFinished();
+    } else {
+      updateTimerDisplay();
+    }
+  }, 250);
+}
+function stopTimer() {
+  running = false;
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  lastTick = null;
+  if (startPauseBtn) startPauseBtn.textContent = remainingSeconds < sectionTotalSeconds ? "Resume" : "Start";
+}
+function toggleTimer() {
+  if (running) {
+    stopTimer();
+    updateTimerDisplay();
+  } else {
+    startTimer();
+  }
+}
+function beep() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 660;
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.45);
+  } catch (_) {}
+}
+function sectionFinished() {
+  stopTimer();
+  beep();
+  const lesson = lessons[lessonIndex];
+  if (sectionIndex < lesson.sections.length - 1) {
+    setTimeout(() => loadSection(sectionIndex + 1, true), 450);
+  } else {
+    completeSession();
+  }
+}
+function completeSession() {
+  stopTimer();
+  activeContent.style.display = "none";
+  completeBanner.classList.add("show");
+  timerLabel.textContent = "Session complete";
+  timerEl.textContent = "30:00";
+  progressBar.style.transform = "scaleX(1)";
+  startPauseBtn.disabled = true;
+  prevSectionBtn.disabled = false;
+  nextSectionBtn.disabled = true;
+  resetSectionBtn.disabled = true;
+  localStorage.setItem("guitarPracticeProgress", JSON.stringify({
+    lessonIndex: Math.min(lessonIndex + 1, lessons.length - 1),
+    sectionIndex: 0
+  }));
+}
+function restartSession() {
+  startPauseBtn.disabled = false;
+  nextSectionBtn.disabled = false;
+  resetSectionBtn.disabled = false;
+  loadSection(0, false);
+}
+function saveProgress() {
+  localStorage.setItem("guitarPracticeProgress", JSON.stringify({lessonIndex, sectionIndex}));
+}
+function nextSection() {
+  const lesson = lessons[lessonIndex];
+  if (sectionIndex < lesson.sections.length - 1) loadSection(sectionIndex + 1, false);
+  else completeSession();
+}
+function prevSection() {
+  if (sectionIndex > 0) loadSection(sectionIndex - 1, false);
+}
+function resetSection() {
+  stopTimer();
+  remainingSeconds = sectionTotalSeconds;
+  updateTimerDisplay();
+}
+function loadSelected() {
+  const idx = findLessonIndex(weekSelect.value, sessionSelect.value);
+  if (idx >= 0) loadLesson(idx, false);
+}
+
+loadBtn.addEventListener("click", loadSelected);
+startPauseBtn.addEventListener("click", toggleTimer);
+prevSectionBtn.addEventListener("click", prevSection);
+nextSectionBtn.addEventListener("click", nextSection);
+resetSectionBtn.addEventListener("click", resetSection);
+restartBtn.addEventListener("click", restartSession);
+prevSessionBtn.addEventListener("click", () => loadLesson(lessonIndex - 1, false));
+nextSessionBtn.addEventListener("click", () => loadLesson(lessonIndex + 1, false));
+resetProgressBtn.addEventListener("click", () => {
+  localStorage.removeItem("guitarPracticeProgress");
+  loadLesson(0, false);
+});
+
+populatePickers();
+const saved = JSON.parse(localStorage.getItem("guitarPracticeProgress") || "null");
+loadLesson(saved?.lessonIndex ?? 0, true);
+</script>
+</body>
+</html>
