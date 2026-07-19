@@ -20,15 +20,13 @@ The app is designed to remove the friction of deciding what to practice. Pick yo
 
 The project is a static HTML app.
 
-You can open `index.html` directly in a browser, or serve the directory with any static web server.
-
-For example, with Python:
+You can open `index.html` directly in a browser, or serve the directory with the included dev server script:
 
 ```bash
-python3 -m http.server 9000
+./bin/serve
 ```
 
-Then open:
+This starts a local web server on port 9000 (pass a different port as the first argument, e.g. `./bin/serve 8080`). Then open:
 
 ```text
 http://${DOMAIN}:${PORT}
@@ -41,6 +39,8 @@ We'll use Github Pages, though this hasn't been setup yet.
 
 ```text
 .
+├── bin/
+│   └── serve       # local dev web server
 ├── index.html
 └── README.md
 ```

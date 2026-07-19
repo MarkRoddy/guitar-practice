@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# Run a local dev web server for the Guitar Practice app.
+#
+# Usage:
+#   ./bin/serve [PORT]
+#
+# Defaults to port 9000. Serves the repository root so index.html is
+# available at http://localhost:PORT/
+set -euo pipefail
+
+PORT="${1:-9000}"
+
+# Resolve the repo root (parent of this script's directory) so the server
+# works regardless of the current working directory.
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+echo "Serving ${ROOT}"
+echo "Open http://localhost:${PORT}/"
+
+cd "$ROOT"
+exec python3 -m http.server "$PORT"
