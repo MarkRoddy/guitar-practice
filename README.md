@@ -33,7 +33,32 @@ http://${DOMAIN}:${PORT}
 ```
 
 ## Deployment
-We'll use Github Pages, though this hasn't been setup yet.
+
+The app is deployed via GitHub Pages (serving `main` at the repo root) at:
+
+```text
+https://blog.mark-roddy.com/guitar-practice/
+```
+
+### Linking to a specific session
+
+You can deep-link directly to a lesson's overview with URL parameters — handy for a calendar event that points at the day's session:
+
+```text
+https://blog.mark-roddy.com/guitar-practice/?session=5
+https://blog.mark-roddy.com/guitar-practice/?week=3&session=5
+https://blog.mark-roddy.com/guitar-practice/?week=3&part=2
+https://blog.mark-roddy.com/guitar-practice/?w=3&p=2
+```
+
+Supported parameters (each has a long and short form):
+
+* `session` / `s` — absolute session number (1–8, unique across the plan). Enough on its own.
+* `week` / `w` + `session` / `s` — explicit week and absolute session.
+* `week` / `w` + `part` / `p` — the first (`part=1`) or second (`part=2`) session *within* that week. Useful when you think in terms of "week 3, second session" rather than the absolute session number.
+* `week` / `w` alone — that week's first session.
+
+An explicit link always opens that lesson's overview, ignoring any saved progress, so the link is deterministic. As you navigate sessions in the app, the address bar stays in sync (normalized to `?week=W&session=S`) so the current URL is always shareable.
 
 ## Project Structure
 

@@ -868,6 +868,17 @@ function renderMeta() {
   sessionSummary.textContent = lesson.summary;
   prevSessionBtn.disabled = lessonIndex === 0;
   nextSessionBtn.disabled = lessonIndex === lessons.length - 1;
+  syncUrlToLesson();
+}
+// Reflect the current lesson in the URL so the address bar is always a
+// shareable, deep link to this session (e.g. for a calendar event).
+function syncUrlToLesson() {
+  const lesson = lessons[lessonIndex];
+  // Write a clean, predictable query string (week then session).
+  const params = new URLSearchParams();
+  params.set("week", lesson.week);
+  params.set("session", lesson.session);
+  history.replaceState(null, "", `${window.location.pathname}?${params}`);
 }
 function loadSection(index, autoplay = false) {
   stopTimer();
@@ -1051,9 +1062,51 @@ resetProgressBtn.addEventListener("click", () => {
   loadLesson(0, false);
 });
 
+// Resolve a lesson index from URL params. Each param has a long and short
+// form (week/w, session/s, part/p). Supports:
+//   ?session=N | ?s=N        absolute session number (unique across the plan)
+//   ?week=W&session=S        explicit week + absolute session
+//   ?week=W&part=1|2         the 1st or 2nd session *within* that week
+//   ?w=W&p=1|2               (abbreviated form of the above)
+//   ?week=W | ?w=W           that week's first session
+// Returns -1 if none/invalid.
+function lessonIndexFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const param = (long, short) => params.get(long) ?? params.get(short);
+  const weekParam = param("week", "w");
+  const sessionParam = param("session", "s") ?? params.get("lesson");
+  const partParam = param("part", "p");
+  if (sessionParam === null && weekParam === null) return -1;
+
+  // week + part: pick the Nth session within the week (1-based, 1 or 2).
+  if (weekParam !== null && partParam !== null) {
+    const part = Number(partParam);
+    const weekLessons = lessons.filter(l => l.week === Number(weekParam));
+    if (Number.isInteger(part) && part >= 1 && part <= weekLessons.length) {
+      return lessons.indexOf(weekLessons[part - 1]);
+    }
+    return -1;
+  }
+  if (weekParam !== null && sessionParam !== null) {
+    return findLessonIndex(weekParam, sessionParam);
+  }
+  if (sessionParam !== null) {
+    return lessons.findIndex(l => l.session === Number(sessionParam));
+  }
+  // Week only: land on that week's first session.
+  return lessons.findIndex(l => l.week === Number(weekParam));
+}
+
 populatePickers();
-const saved = JSON.parse(localStorage.getItem("guitarPracticeProgress") || "null");
-loadLesson(saved?.lessonIndex ?? 0, true);
+const urlLessonIndex = lessonIndexFromUrl();
+if (urlLessonIndex >= 0) {
+  // An explicit link (e.g. from a calendar event) always lands on that
+  // lesson's overview, ignoring saved progress so the link is deterministic.
+  loadLesson(urlLessonIndex, false);
+} else {
+  const saved = JSON.parse(localStorage.getItem("guitarPracticeProgress") || "null");
+  loadLesson(saved?.lessonIndex ?? 0, true);
+}
 </script>
 </body>
 </html>
